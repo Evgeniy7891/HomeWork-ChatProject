@@ -28,18 +28,6 @@ class Service {
             messages.add(name)
         }
     }
-
-    // функция получения списка сообщений без проверки что сообщение удаленно или нет
-    fun returnMessage(key: Keychat): List<Message> {
-        val result = base.filter { entry -> entry.key == listOf(key) }.values.first().messages
-        return result
-    }
-
-    // функция получения списка сообщений вариант 2
-    fun returnMessage2(account: Int, key: Keychat): List<Message> {
-        return base.getValue(listOf(account, key.id)).messages.filter { it -> it.stateMessage == true }
-    }
-
     // получения чатов
     fun returnChat(key: Keychat): Boolean {
         if (key.stateChat == true) {
@@ -49,7 +37,6 @@ class Service {
             return false
         }
     }
-
     // функция удаления чатов и сообщений принадлежавшие этому чату
     fun deleteChat(account: Int, key: Keychat) {
         base.filter { base -> listOf(base.key) == listOf(account, key.id) && key.stateChat == true }
@@ -58,11 +45,40 @@ class Service {
             elem.stateMessage = false
         }
     }
+    // Piperline
+    // функция получения списка сообщений без проверки что сообщение удаленно или нет
+    fun returnMessage(key: Keychat): List<Message> {
+        val result = base
+            .filter { entry -> entry.key == listOf(key) }
+            .values
+            .first()
+            .messages
+        return result
+    }
+    // функция получения списка сообщений вариант 2
+    fun returnMessage2(account: Int, key: Keychat): List<Message> {
+        return base
+            .getValue(listOf(account, key.id))
+            .messages
+            .filter { it -> it.stateMessage == true }
+    }
     // получения количества не прочитанных сообшений
     fun getUnreadMessage(account: Int, key: Keychat): Int {
-        return returnMessage2(account, key).filter { it -> it.readMessage == false }.count()
+        val result =
+            returnMessage2(account, key)
+                .filter { it -> it.readMessage.equals(false) }
+                .count()
+        return result.toInt()
+    }
+
+    fun countLike() {
+        val result = base
+            .filter { it.value.like > 1 }
+            .values
+            .take(1)
+            .map { it.like }
+        println(result)
     }
 }
-
 
 
